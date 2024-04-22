@@ -1,0 +1,29 @@
+html {
+  font-family: 'Open Sans', Verdana, Geneva, Tahoma, sans-serif;
+}
+
+body {
+  @apply bg-white text-black;
+}
+body-dark {
+  @apply bg-black text-white;
+}
+
+nav
+{
+   position: fixed;
+   top: 0;
+   background-color: #781a1a;
+   width: 100%;
+   top:0;
+   left:0;
+   right:0;
+   border-bottom:1px solid #1a1a1a;
+   height: 5px;
+   opacity: 100px;
+   z-index: 1;
+}
+
+.formysanity {
+  list-style-type: none;
+}
