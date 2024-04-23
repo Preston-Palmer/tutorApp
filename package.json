@@ -13,6 +13,8 @@
   "dependencies": {
     "@unocss/reset": "^0.55.7",
     "axios": "^1.6.8",
+    "jwt-decode": "^4.0.0",
+    "nanoid": "^5.0.7",
     "vue": "^3.4.24",
     "vue-router": "^4.3.2"
   },
