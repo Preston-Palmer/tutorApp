@@ -1,5 +1,37 @@
 <template>
-    <div></div>
+    <div
+        class="container mx-auto max-w-prose flex flex-col justify-center items-center p-2 min-h-screen gap-4"
+    >
+        <div class="text-6xl">Login</div>
+        <fieldset class="flex border rounded-lg flex-col gap-0.5 text-xl">
+            <legend class="text-4xl mx-20 my-1">Roles</legend>
+            <label class="flex items-center mx-2"
+                ><input
+                    v-model="user.scope"
+                    class="rounded-lg"
+                    type="checkbox"
+                    value="admin"
+                />
+                <span class="mx-1">Admin</span>
+            </label>
+            <label class="flex items-center mx-2">
+                <input
+                    v-model="user.scope"
+                    class="rounded-lg"
+                    type="checkbox"
+                    value="tutor"
+                /><span class="mx-1">Tutor</span>
+            </label>
+            <label class="flex items-center mx-2">
+                <input
+                    v-model="user.scope"
+                    class="rounded-lg"
+                    type="checkbox"
+                    value="student"
+                /><span class="mx-1">Student</span>
+            </label>
+        </fieldset>
+    </div>
 </template>
 <!-- I want profile to be the login page if not authenticated. Should the login page be when you open it? I got it,
 It will show the tutors and who is available. So if not authenticated it will take you to the page where the tutors are and basically be a lesser version
