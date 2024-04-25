@@ -15,11 +15,11 @@
     "axios": "^1.6.8",
     "jwt-decode": "^4.0.0",
     "nanoid": "^5.0.7",
-    "vue": "^3.4.24",
+    "vue": "^3.4.25",
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
-    "@iconify/json": "^2.2.203",
+    "@iconify/json": "^2.2.204",
     "@julr/unocss-preset-forms": "^0.0.5",
     "@typescript-eslint/parser": "^6.21.0",
     "@unocss/preset-icons": "^0.55.7",
