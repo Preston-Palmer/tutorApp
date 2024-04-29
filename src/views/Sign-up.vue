@@ -23,12 +23,13 @@
         </div>
         <fieldset class="flex border rounded-lg flex-col gap-0.5 text-xl">
             <legend class="text-4xl mx-20 my-1">Roles</legend>
-            <label class="flex items-center mx-2"
-                ><input
+            <label class="flex items-center mx-2">
+                <input
                     v-model="user.scope"
                     class="rounded-lg"
-                    type="checkbox"
+                    type="radio"
                     value="admin"
+                    name="roles"
                 />
                 <span class="mx-1">Admin</span>
             </label>
@@ -36,17 +37,21 @@
                 <input
                     v-model="user.scope"
                     class="rounded-lg"
-                    type="checkbox"
+                    type="radio"
                     value="tutor"
-                /><span class="mx-1">Tutor</span>
+                    name="roles"
+                />
+                <span class="mx-1">Tutor</span>
             </label>
             <label class="flex items-center mx-2">
                 <input
                     v-model="user.scope"
                     class="rounded-lg"
-                    type="checkbox"
+                    type="radio"
                     value="student"
-                /><span class="mx-1">Student</span>
+                    name="roles"
+                />
+                <span class="mx-1">Student</span>
             </label>
         </fieldset>
         <button
@@ -97,6 +102,7 @@ const addUser = async () => {
     console.log('adding user')
     user.value.id = nanoid()
     console.log('posting to /api/v1/users')
+    console.log('value of user' + JSON.stringify(user.value.scope))
     const response = await fetch('/api/v1/users', {
         method: 'POST',
         headers: {

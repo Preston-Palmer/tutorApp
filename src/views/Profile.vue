@@ -26,7 +26,7 @@
                     name="password"
                 />
                 <button
-                    class="items-center justify-center mt-4 flex bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-90 rounded-lg w-50 text-xl text-white p-2"
+                    class="ml-4 items-center justify-center mt-4 flex bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-90 rounded-lg w-50 text-xl text-white p-2"
                     @click="login"
                 >
                     Login
@@ -34,12 +34,26 @@
             </div>
             <RouterLink
                 to="/Signup"
-                class="text-xl bg-blue-600 rounded-lg text-white hover:shadow-lg focus:shadow-lg hover:brightness-90 items-center justify-center flex w-50 p-2"
+                class="items-center justify-center text-xl bg-blue-600 rounded-lg text-white hover:shadow-lg focus:shadow-lg hover:brightness-90 flex w-50 p-2"
                 >Sign-up</RouterLink
             >
         </div>
     </div>
-    <div v-else>Profile Page</div>
+    <div
+        v-else
+        class="container mx-auto max-w-prose flex flex-col my-50 items-center p-2 min-h-screen gap-4"
+    >
+        <div class="flex">Pic:</div>
+        <div class="flex">Name: {{ authenticated.name }}</div>
+        <div class="flex">Permissions: {{ authenticated.scope }}</div>
+        <button
+            class="items-center justify-center text-xl bg-blue-600 rounded-lg text-white hover:shadow-lg focus:shadow-lg hover:brightness-90 flex w-50 p-2"
+            @click="logout"
+        >
+            Logout
+        </button>
+        <div v-if="authenticated.scope.toString() == 'tutor'"></div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -53,6 +67,11 @@ interface User {
     password: string
     scope: string[]
 }
+// interface Tutor {}
+
+// interface Student {}
+
+// interface Admin {}
 
 const user = ref({
     scope: [] as string[]
@@ -106,6 +125,17 @@ const login = async () => {
     } catch (error) {
         console.error('error logging in', error)
         alert('Invalid credentials')
+    }
+}
+
+const logout = () => {
+    sessionStorage.removeItem('token')
+    authenticated.value = {
+        id: '',
+        name: '',
+        username: '',
+        password: '',
+        scope: []
     }
 }
 </script>
