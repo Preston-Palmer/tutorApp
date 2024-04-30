@@ -1,9 +1,27 @@
 <template>
-    <div
+    <form
         class="container mx-auto max-w-prose flex flex-col my-50 items-center p-2 min-h-screen gap-4"
     >
         <div>
-            <div class="text-6xl gap-2">Sign-up</div>
+            <div class="text-5xl gap-2 text-center">Sign-up</div>
+            <label for="fname" class="text-3xl flex mt-5">First name</label>
+            <input
+                id="fname"
+                v-model="user.fname"
+                class="rounded-lg"
+                type="text"
+                name="fname"
+                required
+            />
+            <label for="lname" class="text-3xl flex mt-2">Last name</label>
+            <input
+                id="lname"
+                v-model="user.lname"
+                class="rounded-lg"
+                type="text"
+                name="lname"
+                required
+            />
             <label for="username" class="text-3xl flex mt-2">Username</label>
             <input
                 id="username"
@@ -11,6 +29,7 @@
                 class="rounded-lg"
                 type="text"
                 name="username"
+                required
             />
             <label for="password" class="text-3xl flex mt-1">Password</label>
             <input
@@ -19,6 +38,7 @@
                 class="rounded-lg"
                 type="password"
                 name="password"
+                required
             />
         </div>
         <fieldset class="flex border rounded-lg flex-col gap-0.5 text-xl">
@@ -30,6 +50,7 @@
                     type="radio"
                     value="admin"
                     name="roles"
+                    required
                 />
                 <span class="mx-1">Admin</span>
             </label>
@@ -54,14 +75,17 @@
                 <span class="mx-1">Student</span>
             </label>
         </fieldset>
-        <button
-            class="bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-110 rounded-lg w-50 text-xl text-white p-2"
+        <RouterLink
+            to="/Profile"
+            class="text-center bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-110 rounded-lg w-50 text-xl text-white p-2"
             @click="addUser"
         >
             Add Account
-        </button>
-    </div>
+        </RouterLink>
+    </form>
 </template>
+<!-- Definetly need to make sure they can't make a user with the same username -->
+
 <!-- I want profile to be the login page if not authenticated. Should the login page be when you open it? I got it,
 It will show the tutors and who is available. So if not authenticated it will take you to the page where the tutors are and basically be a lesser version
 of a student view
@@ -76,13 +100,14 @@ import { ref, onMounted } from 'vue'
 
 interface User {
     id: string
-    name: string
+    fname: string
+    lname: string
     username: string
     password: string
-    scope: string[]
+    scope: string
 }
 const users = ref({} as User[])
-const user = ref({ scope: [] as string[] } as User)
+const user = ref({} as User)
 const authenticated = ref({} as User)
 let token = ''
 
@@ -113,9 +138,6 @@ const addUser = async () => {
     const data = await response.json()
     users.value.push(data)
     console.log('finished posting to /api/v1/users', users.value)
-    user.value = {
-        scope: [] as string[]
-    } as User
 }
 onMounted(() => {
     token = sessionStorage.getItem('token') || ''
@@ -125,7 +147,8 @@ onMounted(() => {
     const td = jwtDecode(token) as User
     authenticated.value = {
         id: td.id,
-        name: td.name,
+        fname: td.fname,
+        lname: td.lname,
         username: td.username,
         password: '',
         scope: td.scope

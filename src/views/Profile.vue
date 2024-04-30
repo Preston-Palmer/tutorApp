@@ -3,7 +3,7 @@
         <div
             class="container mx-auto max-w-prose flex flex-col my-50 items-center p-2 min-h-screen gap-4"
         >
-            <div class="text-4xl">Login</div>
+            <div class="text-5xl">Login</div>
             <div>
                 <label for="username" class="text-3xl flex mt-2"
                     >Username</label
@@ -14,6 +14,7 @@
                     class="rounded-lg"
                     type="text"
                     name="username"
+                    @keyup.enter="login"
                 />
                 <label for="password" class="text-3xl flex mt-1"
                     >Password</label
@@ -24,9 +25,10 @@
                     class="rounded-lg"
                     type="password"
                     name="password"
+                    @keyup.enter="login"
                 />
                 <button
-                    class="ml-4 items-center justify-center mt-4 flex bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-90 rounded-lg w-50 text-xl text-white p-2"
+                    class="items-center justify-center mt-4 flex bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-90 rounded-lg w-50 text-xl text-white p-2"
                     @click="login"
                 >
                     Login
@@ -43,8 +45,10 @@
         v-else
         class="container mx-auto max-w-prose flex flex-col my-50 items-center p-2 min-h-screen gap-4"
     >
-        <div class="flex">Pic:</div>
-        <div class="flex">Name: {{ authenticated.name }}</div>
+        <!-- <div class="flex">Pic:</div> -->
+        <div class="flex">
+            Name: {{ authenticated.fname }} {{ authenticated.lname }}
+        </div>
         <div class="flex">Permissions: {{ authenticated.scope }}</div>
         <button
             class="items-center justify-center text-xl bg-blue-600 rounded-lg text-white hover:shadow-lg focus:shadow-lg hover:brightness-90 flex w-50 p-2"
@@ -62,10 +66,11 @@ import { ref, onMounted } from 'vue'
 
 interface User {
     id: string
-    name: string
+    fname: string
+    lname: string
     username: string
     password: string
-    scope: string[]
+    scope: string
 }
 // interface Tutor {}
 
@@ -73,9 +78,7 @@ interface User {
 
 // interface Admin {}
 
-const user = ref({
-    scope: [] as string[]
-} as User)
+const user = ref({} as User)
 const authenticated = ref({} as User)
 let token = ''
 
@@ -87,7 +90,8 @@ onMounted(() => {
     const td = jwtDecode(token) as User
     authenticated.value = {
         id: td.id,
-        name: td.name,
+        fname: td.fname,
+        lname: td.lname,
         username: td.username,
         password: '',
         scope: td.scope
@@ -110,17 +114,19 @@ const login = async () => {
         const td = jwtDecode(token) as User
         authenticated.value = {
             id: td.id,
-            name: td.name,
+            fname: td.fname,
+            lname: td.lname,
             username: td.username,
             password: '',
             scope: td.scope
         }
         console.log('logged in', authenticated.value)
         user.value = {
-            name: '',
+            fname: '',
+            lname: '',
             username: '',
             password: '',
-            scope: [] as string[]
+            scope: ''
         } as User
     } catch (error) {
         console.error('error logging in', error)
@@ -132,10 +138,11 @@ const logout = () => {
     sessionStorage.removeItem('token')
     authenticated.value = {
         id: '',
-        name: '',
+        fname: '',
+        lname: '',
         username: '',
         password: '',
-        scope: []
+        scope: ''
     }
 }
 </script>
