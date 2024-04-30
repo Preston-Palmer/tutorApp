@@ -4,62 +4,49 @@
     >
         <div>
             <div class="text-5xl gap-2 text-center">Sign-up</div>
-            <label for="fname" class="text-3xl flex mt-5">First name</label>
+            <label for="date" class="text-3xl flex mt-2">Date</label>
             <input
-                id="fname"
-                v-model="user.fname"
+                id="date"
+                v-model="date.date"
                 class="rounded-lg"
-                type="text"
-                name="fname"
+                type="date"
+                name="date"
                 required
             />
-            <label for="lname" class="text-3xl flex mt-2">Last name</label>
+            <label for="time" class="text-3xl flex mt-2">Time</label>
             <input
-                id="lname"
-                v-model="user.lname"
+                id="time"
+                v-model="date.time"
                 class="rounded-lg"
-                type="text"
-                name="lname"
-                required
-            />
-            <label for="username" class="text-3xl flex mt-2">Username</label>
-            <input
-                id="username"
-                v-model="user.username"
-                class="rounded-lg"
-                type="text"
-                name="username"
-                required
-            />
-            <label for="password" class="text-3xl flex mt-2">Password</label>
-            <input
-                id="password"
-                v-model="user.password"
-                class="rounded-lg"
-                type="password"
-                name="password"
+                type="time"
+                name="time"
                 required
             />
             <label for="subject" class="text-3xl flex mt-2">Subject</label>
             <input
                 id="subject"
-                v-model="tutor.subject"
-                placeholder="use for tutors"
+                v-model="date.subject"
                 class="rounded-lg"
                 type="text"
                 name="subject"
+                required
             />
-            <label for="availability" class="text-3xl flex mt-2"
-                >Availability</label
-            >
-            <input
-                id="availability"
-                v-model="tutor.availability"
-                placeholder="use for tutors"
+            <label for="notes" class="text-3xl flex mt-2">Notes</label>
+            <textarea
+                id="notes"
+                v-model="date.notes"
                 class="rounded-lg"
                 type="text"
-                name="availability"
-            />
+                name="notes"
+                required
+            >
+            </textarea>
+            <RouterLink
+                to="/"
+                class="mt-2 flex text-center justify-center bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-110 rounded-lg w-50 text-xl text-white p-2"
+                @click="submitSchedule"
+                >Submit</RouterLink
+            >
         </div>
     </form>
 </template>
@@ -87,11 +74,13 @@ interface Tutor {
 interface Date {
     id: string
     date: string
-    tutor: Tutor
-    student: User
+    time: string
+    tutor: string
+    student: string
     subject: string
     notes: string
     completed: boolean
+    confirmed: boolean
 }
 
 const date = ref({} as Date)
@@ -109,8 +98,12 @@ let token = ''
 
 const submitSchedule = async () => {
     date.value.id = nanoid()
-    date.value.tutor = tutor.value.fname
-    const response = await fetch('/api/v1/date', {
+    date.value.tutor = tutor.value.id
+    date.value.student = authenticated.value.id
+    date.value.completed = false
+    date.value.confirmed = false
+    console.log('posting to /api/v1/dates')
+    const response = await fetch('/api/v1/dates', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -118,6 +111,7 @@ const submitSchedule = async () => {
         body: JSON.stringify(date.value)
     })
     await response.json()
+    console.log('finished posting to /api/v1/dates', date.value)
 }
 
 onMounted(async () => {

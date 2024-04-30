@@ -5,24 +5,44 @@
                 authenticated.scope && authenticated.scope.toString() == 'tutor'
             "
         >
-            <div class="ml-5 text-4xl">Students</div>
-            <ul class="grid grid-cols-1">
+            <div class="ml-5 text-4xl mt-4">Scheduled Appointments</div>
+            <ul class="grid grid-cols-3 gap-2">
                 <li
-                    v-for="student in students"
-                    :key="student.id"
-                    class="ml-2 bg-gray-400 mt-2 flex text-2xl rounded-lg max-w-prose"
+                    v-for="date in tutorDates"
+                    :key="date.id"
+                    class="ml-2 bg-gray-400 text-gray-800 text-3xl overflow-auto tracking-wider h-80 p-3 rounded-lg shadow-lg justify-between w-full"
                 >
-                    {{ student.fname }} {{ student.lname }}
-                </li>
-            </ul>
-            <div class="ml-5 text-4xl">Scheduled Appointments</div>
-            <ul class="grid grid-cols-1">
-                <li
-                    v-for="student in students"
-                    :key="student.id"
-                    class="ml-2 bg-gray-400 mt-2 flex text-2xl rounded-lg max-w-prose"
-                >
-                    {{ student.fname }} {{ student.lname }}
+                    <div class="text-center rounded-lg bg-gray-500">
+                        Student: {{ getStudentNameById(date.student) }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Tutor: {{ getTutorNameById(date.tutor) }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Date: {{ date.date }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Time: {{ date.time }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Subject: {{ date.subject }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Notes: {{ date.notes }}
+                    </div>
+                    <button
+                        v-if="!date.confirmed"
+                        class="text-center bg-blue-600 hover:shadow-lg focus:shadow-lg hover:brightness-110 rounded-lg w-50 text-xl text-white p-2 w-full mt-2"
+                        @click="verifyDate(date)"
+                    >
+                        Verify
+                    </button>
+                    <div
+                        v-else
+                        class="text-center text-white rounded-lg bg-gray-800 mt-2"
+                    >
+                        Confirmed
+                    </div>
                 </li>
             </ul>
         </div>
@@ -61,11 +81,34 @@
             <div class="ml-5 text-4xl mt-4">Scheduled Appointments</div>
             <ul class="grid grid-cols-3 gap-2">
                 <li
-                    v-for="tutor in tutors"
-                    :key="tutor.id"
+                    v-for="date in studentDates"
+                    :key="date.id"
                     class="ml-2 bg-gray-400 text-gray-800 text-3xl overflow-auto tracking-wider h-80 p-3 rounded-lg shadow-lg justify-between w-full"
                 >
-                    {{ tutor.fname }} {{ tutor.lname }}
+                    <div class="text-center rounded-lg bg-gray-500">
+                        Tutor: {{ getTutorNameById(date.tutor) }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Student: {{ getStudentNameById(date.student) }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Date: {{ date.date }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Time: {{ date.time }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Subject: {{ date.subject }}
+                    </div>
+                    <div class="text-center rounded-lg bg-gray-500 mt-2">
+                        Notes: {{ date.notes }}
+                    </div>
+                    <div
+                        v-if="date.confirmed"
+                        class="text-center text-white rounded-lg bg-gray-800 mt-2"
+                    >
+                        Confirmed
+                    </div>
                 </li>
             </ul>
         </div>
@@ -94,11 +137,48 @@ interface Tutor {
     availability: string
 }
 
+interface Date {
+    id: string
+    date: string
+    time: string
+    tutor: string
+    student: string
+    subject: string
+    notes: string
+    completed: boolean
+    confirmed: boolean
+}
+
 const students = ref({} as User[])
 const tutors = ref({} as Tutor[])
 const users = ref({} as User[])
+const tutorDates = ref({} as Date[])
+const studentDates = ref({} as Date[])
 const authenticated = ref({} as User)
 let token = ''
+
+const verifyDate = async (date: Date) => {
+    date.confirmed = true
+    console.log('date confirmed for', date.id)
+    const response = await fetch(`/api/v1/dates/${date.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(date)
+    })
+    await response.json()
+}
+
+const getStudentNameById = (id: string) => {
+    const student = students.value.find((student) => student.id === id)
+    return student ? `${student.fname} ${student.lname}` : 'Unknown Student'
+}
+
+const getTutorNameById = (id: string) => {
+    const tutor = tutors.value.find((tutor) => tutor.id === id)
+    return tutor ? `${tutor.fname} ${tutor.lname}` : 'Unknown Tutor'
+}
 
 const fetchUsers = async () => {
     console.log('fetching users')
@@ -123,6 +203,35 @@ const fetchTutors = async () => {
     tutors.value = await response.json()
     console.log('fetched tutors', tutors.value)
 }
+const fetchStudentDates = async () => {
+    console.log('fetching Student Dates')
+    const response = await fetch('/api/v1/dates', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    console.log('assigned Student Dates')
+    studentDates.value = await response.json()
+    studentDates.value = studentDates.value.filter(
+        (date: Date) => date.student == authenticated.value.id
+    )
+    console.log('fetched Student Dates', studentDates.value)
+}
+
+const fetchTutorDates = async () => {
+    console.log('fetching Tutor Dates')
+    const response = await fetch('/api/v1/dates', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    console.log('assigned Tutor Dates')
+    tutorDates.value = await response.json()
+    tutorDates.value = tutorDates.value.filter(
+        (date: Date) => date.tutor == authenticated.value.id
+    )
+    console.log('fetched Tutor Dates', tutorDates.value)
+}
 
 const schedule = async (tutor: Tutor) => {
     console.log('scheduling tutor')
@@ -145,5 +254,7 @@ onMounted(async () => {
     }
     await fetchUsers()
     await fetchTutors()
+    await fetchStudentDates()
+    await fetchTutorDates()
 })
 </script>
