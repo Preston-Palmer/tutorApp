@@ -31,7 +31,7 @@
                 name="username"
                 required
             />
-            <label for="password" class="text-3xl flex mt-1">Password</label>
+            <label for="password" class="text-3xl flex mt-2">Password</label>
             <input
                 id="password"
                 v-model="user.password"
@@ -39,6 +39,26 @@
                 type="password"
                 name="password"
                 required
+            />
+            <label for="subject" class="text-3xl flex mt-2">Subject</label>
+            <input
+                id="subject"
+                v-model="tutor.subject"
+                placeholder="use for tutors"
+                class="rounded-lg"
+                type="text"
+                name="subject"
+            />
+            <label for="availability" class="text-3xl flex mt-2"
+                >Availability</label
+            >
+            <input
+                id="availability"
+                v-model="tutor.availability"
+                placeholder="use for tutors"
+                class="rounded-lg"
+                type="text"
+                name="availability"
             />
         </div>
         <fieldset class="flex border rounded-lg flex-col gap-0.5 text-xl">
@@ -106,8 +126,18 @@ interface User {
     password: string
     scope: string
 }
+
+interface Tutor {
+    id: string
+    fname: string
+    lname: string
+    subject: string
+    availability: string
+}
+
 const users = ref({} as User[])
 const user = ref({} as User)
+const tutor = ref({} as Tutor)
 const authenticated = ref({} as User)
 let token = ''
 
@@ -125,6 +155,14 @@ const fetchUsers = async () => {
 //Originally for a userDialog box, but now for an inset input
 const addUser = async () => {
     console.log('adding user')
+    user.value.fname = user.value.fname
+        .split(' ')
+        .map((l: string) => l[0].toUpperCase() + l.substring(1))
+        .join(' ')
+    user.value.lname = user.value.lname
+        .split(' ')
+        .map((l: string) => l[0].toUpperCase() + l.substring(1))
+        .join(' ')
     user.value.id = nanoid()
     console.log('posting to /api/v1/users')
     console.log('value of user' + JSON.stringify(user.value.scope))
@@ -135,9 +173,25 @@ const addUser = async () => {
         },
         body: JSON.stringify(user.value)
     })
-    const data = await response.json()
-    users.value.push(data)
+    await response.json()
+    // users.value.push(data)
     console.log('finished posting to /api/v1/users', users.value)
+
+    tutor.value.id = user.value.id
+    tutor.value.fname = user.value.fname
+    tutor.value.lname = user.value.lname
+    if (user.value && user.value.scope == 'tutor') {
+        console.log('posting to /api/v1/tutors')
+        const response = await fetch('/api/v1/tutors', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(tutor.value)
+        })
+        await response.json()
+        console.log('finished posting to /api/v1/tutors', tutor.value)
+    }
 }
 onMounted(() => {
     token = sessionStorage.getItem('token') || ''
